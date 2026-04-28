@@ -28,11 +28,11 @@ export type Role = (typeof ROLES)[number];
 
 /** Colors assigned to each role for consistent visuals across charts. */
 export const ROLE_COLORS: Record<Role, string> = {
-	attacker: formatCss(colors.red),
+	attacker: colors.red.to_css(),
 	oem: '#457b9d',
-	battery: formatCss(colors.green),
+	battery: colors.green.to_css(),
 	aggregator: '#e9c46a',
-	isp: formatCss(colors.orange),
+	isp: colors.orange.to_css(),
 	utility: '#264653',
 	substation: '#6a4c93',
 	infrastructure: '#adb5bd'
@@ -88,11 +88,11 @@ export const APP_PROTOCOL_LABELS: Record<AppProtocol, string> = {
 
 export const APP_PROTOCOL_COLORS: Record<AppProtocol, string> = {
 	[AppProtocol.APP_UNKNOWN]: '#adb5bd',
-	[AppProtocol.HTTP]: formatCss(colors.red),
-	[AppProtocol.TLS]: formatCss(colors.teal),
-	[AppProtocol.DNS]: formatCss(colors.yellow),
-	[AppProtocol.SSH]: formatCss(colors.blue),
-	[AppProtocol.IEEE_2030_5]: formatCss(colors.orange),
+	[AppProtocol.HTTP]: colors.red.to_css(),
+	[AppProtocol.TLS]: colors.teal.to_css(),
+	[AppProtocol.DNS]: colors.yellow.to_css(),
+	[AppProtocol.SSH]: colors.blue.to_css(),
+	[AppProtocol.IEEE_2030_5]: colors.orange.to_css(),
 	[AppProtocol.EPHEMERAL]: '#dee2e6'
 };
 

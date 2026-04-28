@@ -1,6 +1,5 @@
 import { type Axis } from '$lib/charts';
 import { app_state } from './state.svelte';
-import { formatCss } from 'culori';
 import * as colors from '$lib/colors';
 import type {
 	BuildingData,
@@ -281,12 +280,12 @@ export function building(
 			{
 				name: app_state.scenario.name,
 				data: scenario.timeseries,
-				color: formatCss(colors.scenario)
+				color: colors.scenario.to_css()
 			},
 			{
 				name: app_state.baseline_scenario.name,
 				data: baseline.timeseries,
-				color: formatCss(colors.baseline)
+				color: colors.baseline.to_css()
 			}
 		],
 		y_accessor: (d) => d[variable_name]
@@ -311,12 +310,12 @@ export function building_fleet(variable_name: BuildingVariable): Axis<BuildingTi
 		series: [
 			{
 				name: app_state.scenario.name,
-				color: formatCss(colors.scenario),
+				color: colors.scenario.to_css(),
 				data: app_state.scenario.building_fleet
 			},
 			{
 				name: 'Baseline',
-				color: formatCss(colors.baseline),
+				color: colors.baseline.to_css(),
 				data: app_state.baseline_scenario.building_fleet
 			}
 		],
@@ -357,19 +356,19 @@ export function battery(
 			series: [
 				{
 					name: 'Idle',
-					color: formatCss(colors.idle),
+					color: colors.idle.to_css(),
 					data: scenario.timeseries,
 					y_accessor: (d) => (d.received_signal == 0 ? 100 : 0)
 				},
 				{
 					name: 'Charging',
-					color: formatCss(colors.charging),
+					color: colors.charging.to_css(),
 					data: scenario.timeseries,
 					y_accessor: (d) => (d.received_signal == 1 ? 100 : 0)
 				},
 				{
 					name: 'Discharging',
-					color: formatCss(colors.discharging),
+					color: colors.discharging.to_css(),
 					data: scenario.timeseries,
 					y_accessor: (d) => (d.received_signal == 2 ? 100 : 0)
 				}
@@ -402,12 +401,12 @@ export function battery(
 		series: [
 			{
 				name: app_state.scenario.name,
-				color: formatCss(colors.scenario),
+				color: colors.scenario.to_css(),
 				data: scenario.timeseries
 			},
 			{
 				name: app_state.baseline_scenario.name,
-				color: formatCss(colors.baseline),
+				color: colors.baseline.to_css(),
 				data: baseline.timeseries
 			}
 		],
@@ -428,19 +427,19 @@ export function battery_fleet(variable_name: BatteryVariable): Axis<BatteryFleet
 			series: [
 				{
 					name: 'Idle',
-					color: formatCss(colors.idle),
+					color: colors.idle.to_css(),
 					data: app_state.scenario.battery_fleet,
 					y_accessor: (d) => d.frac_state.idle * 100
 				},
 				{
 					name: 'Charging',
-					color: formatCss(colors.charging),
+					color: colors.charging.to_css(),
 					data: app_state.scenario.battery_fleet,
 					y_accessor: (d) => d.frac_state.charging * 100
 				},
 				{
 					name: 'Discharging',
-					color: formatCss(colors.discharging),
+					color: colors.discharging.to_css(),
 					data: app_state.scenario.battery_fleet,
 					y_accessor: (d) => d.frac_state.discharging * 100
 				}
@@ -474,12 +473,12 @@ export function battery_fleet(variable_name: BatteryVariable): Axis<BatteryFleet
 		series: [
 			{
 				name: app_state.scenario.name,
-				color: formatCss(colors.scenario),
+				color: colors.scenario.to_css(),
 				data: app_state.scenario.battery_fleet
 			},
 			{
 				name: app_state.baseline_scenario.name,
-				color: formatCss(colors.baseline),
+				color: colors.baseline.to_css(),
 				data: app_state.baseline_scenario.battery_fleet
 			}
 		],
