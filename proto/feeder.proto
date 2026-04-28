@@ -1,0 +1,59 @@
+edition = "2023";
+package sd3;
+
+
+message BusConnection {
+  uint32 bus_id = 1;
+  bool phase_a = 2;
+  bool phase_b = 3;
+  bool phase_c = 4;
+}
+
+message Feeder {
+  uint32 source_bus_id = 1;
+
+  repeated Line lines = 2;
+  repeated Load loads = 3;
+  repeated Capacitor capacitors = 4;
+  repeated Regulator regulators = 5;
+  repeated Transformer transformers = 6;
+  repeated Bus buses = 7;
+  message Bus {
+    uint32 id = 1;
+    uint32 x = 2;
+    uint32 y = 3;
+  }
+// Todo remove switches and disabled lines
+  message Line {
+    uint32 id = 1;
+    BusConnection from_bus = 2;
+    BusConnection to_bus = 3;
+    uint32 length_meters = 4;
+    bool switch = 5;
+    bool enabled = 6;
+  }
+
+  message Load {
+    uint32 id = 1;
+    BusConnection bus = 2;
+  }
+
+  message Capacitor {
+    uint32 id = 1;
+    BusConnection bus = 2;
+  }
+
+  message Regulator {
+    uint32 id = 1;
+    uint32 transformer_id = 2;
+    bool phase_a = 3;
+    bool phase_b = 4;
+    bool phase_c = 5;
+  }
+
+  message Transformer {
+    uint32 id = 1;
+    repeated BusConnection bus_connections = 2;
+    // repeated uint32 voltages = 3;
+  }
+}

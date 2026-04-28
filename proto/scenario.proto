@@ -1,0 +1,203 @@
+edition = "2023";
+package sd3;
+
+message Cyber {
+  repeated NetworkEntity entities = 1;
+  repeated TrafficFlow flows = 2;
+
+  enum Transport {
+    TRANSPORT_UNKNOWN = 0;
+    TCP = 1;
+    UDP = 2;
+    ICMP = 3;
+    IGMP = 4;
+  }
+
+  enum AppProtocol {
+    APP_UNKNOWN = 0;
+    HTTP = 1;           // port 9101 — plaintext API to battery EMS
+    TLS = 2;            // port 9001 — TLS API to battery EMS
+    DNS = 3;           // port 53/UDP
+    SSH = 4;           // port 22/TCP
+    IEEE_2030_5 = 5;   // port 4712/UDP
+    EPHEMERAL = 6;        // ephemeral dest port (>= 32768)
+  }
+
+  message NetworkEntity {
+    uint32 id = 1;
+    string ip_address = 2;
+    string label = 3;
+    string role = 4;
+    uint32 grid_component_id = 5;  // FK to component id; 0 = no link
+  }
+
+  message TrafficFlow {
+    uint32 source_id = 1;
+    uint32 dest_id = 2;
+    repeated TimePoint timeseries = 3;
+
+    message TimePoint {
+      uint32 seconds = 1;
+      uint32 bytes = 2;
+      uint32 packets = 3;
+      repeated ProtocolBreakdown protocols = 4;
+
+      message ProtocolBreakdown {
+        Transport transport = 1;
+        AppProtocol app = 2;
+        uint32 bytes = 3;
+        uint32 packets = 4;
+        uint32 rst_count = 5;
+      }
+    }
+  }
+}
+
+message Scenario {
+  string name = 1;
+  repeated Line lines = 2;
+  repeated Transformer transformers = 3;
+  repeated Load loads = 4;
+  repeated Bus buses = 5;
+  repeated Breaker breakers = 6;
+  repeated Circuit circuits = 7;
+  repeated Regulator regulators = 8;
+  repeated Capacitor capacitors = 9;
+
+  uint64 start_time = 10;
+  uint64 end_time = 11;
+
+  Cyber cyber = 12;
+  repeated Battery batteries = 13;
+  repeated Building buildings = 14;
+
+  message Line {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float voltage = 2;
+      float current = 3;
+      float active_power = 4;
+      float reactive_power = 5;
+    }
+  }
+
+  message Transformer {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float voltage = 2;
+      float current = 3;
+      float active_power = 4;
+      float reactive_power = 5;
+    }
+  }
+
+  message Load {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float voltage = 2;
+      float current = 3;
+      float active_power = 4;
+      float reactive_power = 5;
+    }
+  }
+
+  message Bus {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float voltage = 2;
+    }
+  }
+
+  message Breaker {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float voltage = 3;
+      float current = 4;
+      float power = 5;
+      bool status = 6;
+    }
+  }
+
+  message Regulator {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float voltage = 3;
+      float current = 4;
+      float power = 5;
+      float status = 6;
+    }
+  }
+
+  message Capacitor {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float voltage = 3;
+      float current = 4;
+      float power = 5;
+    }
+  }
+
+  message Circuit {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float net_load = 2;
+      float net_reactive_load = 3;
+    }
+  }
+
+  message Battery {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    enum BatteryStatus {
+      IDLE = 0;
+      DISCHARGING = 1;
+      CHARGING = 2;
+    }
+    message TimePoint {
+      uint32 seconds = 1;
+      float received_signal = 2;
+      BatteryStatus status = 3;
+      float state_of_charge = 4;
+      float active_power = 5;
+      float reactive_power = 6;
+    }
+  }
+
+  message Building {
+    uint32 id = 1;
+
+    repeated TimePoint timeseries = 2;
+    message TimePoint {
+      uint32 seconds = 1;
+      float power = 2;
+      float net_power = 3;
+      float purchased_power = 4;
+      float surplus_power = 5;
+    }
+  }
+}
