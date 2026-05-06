@@ -252,7 +252,7 @@ export function graph<T extends HasSeconds>(
 
 			const x_label_bb = x_axis_label.node()?.getBBox();
 			if (x_label_bb) {
-				x_axis_label.attr('x', width / 2).attr('y', height);
+				x_axis_label.attr('x', width / 2).attr('y', height - 1);
 			}
 			series.attr('d', (d) => {
 				const visible = d.data.filter((pt) => {
