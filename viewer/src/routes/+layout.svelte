@@ -1,11 +1,12 @@
 <script lang="ts">
 	import './layout.css';
-	import { app_state } from '$lib/state.svelte';
+	import { app_state } from '$lib';
 	import favicon from '$lib/assets/favicon.svg';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import ScenarioPicker from '$lib/components/ScenarioPicker.svelte';
 	import RangeSelector from '$lib/components/RangeSelector.svelte';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
 	let time = $derived(app_state.scenario.seconds_to_date(app_state.timestamp));
@@ -14,64 +15,75 @@
 
 	let time_multiplier_index = $state(5);
 	let time_multiplier = $derived(time_multipliers[time_multiplier_index % time_multipliers.length]);
+
+	onMount(() => {
+		app_state.init();
+	});
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<div class="layout-grid" style:flex="1" style:place-content="start">
-	<header class="full subgrid" style:z-index="10">
-		<menu class="wide">
-			<nav class="nav-bar left">
-				<a href={resolve('/')} class:active={page.url.pathname === '/'}>Overview</a>
-				<a href={resolve('/grid')} class:active={page.url.pathname === '/grid'}>Grid</a>
-				<a href={resolve('/cyber')} class:active={page.url.pathname === '/cyber'}>Cyber</a>
-				<a href={resolve('/batteries')} class:active={page.url.pathname === '/batteries'}
-					>Batteries</a
-				>
-			</nav>
+{#if app_state.ready}
+	<div class="layout-grid" style:flex="1" style:place-content="start">
+		<header class="full subgrid" style:z-index="10">
+			<menu class="wide">
+				<nav class="nav-bar left">
+					<a href={resolve('/')} class:active={page.url.pathname === '/'}>Overview</a>
+					<a href={resolve('/grid')} class:active={page.url.pathname === '/grid'}>Grid</a>
+					<a href={resolve('/cyber')} class:active={page.url.pathname === '/cyber'}>Cyber</a>
+					<a href={resolve('/batteries')} class:active={page.url.pathname === '/batteries'}
+						>Batteries</a
+					>
+				</nav>
 
-			<div class="row">
-				<button
-					class="button button-primary"
-					style:width="9ch"
-					onclick={() => (app_state.playing ? app_state.stop() : app_state.play(time_multiplier))}
-					>{app_state.playing ? 'Stop' : 'Play'}</button
-				>
-				<RangeSelector
-					min={0}
-					max={Math.floor(
-						(app_state.scenario.end_date.getTime() - app_state.scenario.start_date.getTime()) / 1000
-					)}
-					step={60}
-					bind:value={app_state.timestamp}
-					bind:range={app_state.seconds_brush}
-					ondragstart={() => {
-						app_state.stop();
-					}}
-				>
-					{time.toLocaleTimeString('en-US', {
-						hour: '2-digit',
-						minute: '2-digit',
-						hourCycle: 'h24'
-					})}</RangeSelector
-				>
-				<button
-					class="button button-primary"
-					style:width="9ch"
-					onclick={() => {
-						time_multiplier_index++;
-						if (app_state.playing) {
-							app_state.play(time_multiplier);
-						}
-					}}>{time_multiplier}x</button
-				>
-			</div>
-			<div class="right">
-				<ScenarioPicker bind:scenario={app_state.scenario} />
-			</div>
-		</menu>
-	</header>
-	{@render children()}
-</div>
+				<div class="row">
+					<button
+						class="button button-primary"
+						style:width="9ch"
+						onclick={() => (app_state.playing ? app_state.stop() : app_state.play(time_multiplier))}
+						>{app_state.playing ? 'Stop' : 'Play'}</button
+					>
+					<RangeSelector
+						min={0}
+						max={Math.floor(
+							(app_state.scenario.end_date.getTime() - app_state.scenario.start_date.getTime()) /
+								1000
+						)}
+						step={60}
+						bind:value={app_state.timestamp}
+						bind:range={app_state.seconds_brush}
+						ondragstart={() => {
+							app_state.stop();
+						}}
+					>
+						{time.toLocaleTimeString('en-US', {
+							hour: '2-digit',
+							minute: '2-digit',
+							hourCycle: 'h24'
+						})}</RangeSelector
+					>
+					<button
+						class="button button-primary"
+						style:width="9ch"
+						onclick={() => {
+							time_multiplier_index++;
+							if (app_state.playing) {
+								app_state.play(time_multiplier);
+							}
+						}}>{time_multiplier}x</button
+					>
+				</div>
+				<div class="right flex">
+					<ScenarioPicker bind:scenario={app_state.scenario} />
+				</div>
+			</menu>
+		</header>
+		{@render children()}
+	</div>
+{:else}
+	<div class="loading">
+		<p class="fs-2xl center">Loading</p>
+	</div>
+{/if}
 <footer class="layout-grid">
 	<menu class="wide fs-xs center">
 		<li>©National Laboratory of the Rockies 2026</li>
@@ -133,5 +145,11 @@
 		display: flex;
 		gap: var(--gap);
 		align-items: center;
+	}
+
+	.loading {
+		display: grid;
+		place-content: center;
+		flex: 1;
 	}
 </style>

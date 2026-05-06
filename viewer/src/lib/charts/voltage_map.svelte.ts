@@ -4,7 +4,6 @@ import { seek, type BusTimeSeriesData } from '$lib/scenario';
 import * as d3 from 'd3';
 import { app_state } from '$lib/state.svelte';
 import * as colors from '$lib/colors';
-import { formatCss } from 'culori';
 
 export default function voltage_map(options?: {
 	margin_bottom: number;
@@ -35,7 +34,7 @@ export default function voltage_map(options?: {
 					(phases, connection) => phases.union(connection.phases),
 					new Set<'A' | 'B' | 'C'>()
 				);
-				return formatCss(colors.phase_to_color(phases)) || 'black';
+				return colors.phase_to_color(phases).to_css();
 			})
 			.attr('stroke-width', 2);
 

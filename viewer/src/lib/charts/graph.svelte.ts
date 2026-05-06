@@ -3,7 +3,10 @@ import type { HasSeconds } from '$lib/scenario';
 import * as d3 from 'd3';
 import { type Attachment } from 'svelte/attachments';
 import { untrack } from 'svelte';
-import { colors, app_state } from '$lib';
+import { app_state } from '$lib/state.svelte';
+import * as colors from '$lib/colors';
+import * as css from '$lib/css';
+
 export function graph<T extends HasSeconds>(
 	axis: Axis<T>,
 	options?: {
@@ -71,7 +74,7 @@ export function graph<T extends HasSeconds>(
 			.attr('fill', colors.surface.to_css())
 			.attr('stroke', colors.outline.to_css())
 			.attr('stroke-width', 'var(--border-thickness)')
-			.attr('rx', 'var(--br-sm)');
+			.attr('rx', css.br_sm);
 		const tooltip_text = tooltip
 			.append('text')
 			.attr('fill', colors.on_surface.to_css())

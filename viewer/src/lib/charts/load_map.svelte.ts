@@ -1,8 +1,11 @@
 import { type Attachment } from 'svelte/attachments';
 import type { SVGAttributes } from 'svelte/elements';
-import { app_state, colors } from '$lib';
+import { app_state } from '$lib/state.svelte';
+import * as colors from '$lib/colors';
 import * as d3 from 'd3';
 import { resolve } from '$app/paths';
+import * as css from '$lib/css';
+
 export default function loads(options?: {
 	batteries_only?: boolean;
 	circle?: SVGAttributes<SVGCircleElement>;
@@ -52,9 +55,8 @@ export default function loads(options?: {
 			.attr('fill', colors.white.to_css())
 			.attr('stroke', colors.outline.to_css())
 			.attr('stoke-width', 2)
-			.attr('rx', 'var(--br-sm)');
+			.attr('rx', css.br_sm);
 		const tooltip_text = tooltip.append('text');
-		// tooltip.append('circle').attr('cx', 0).attr('cy', 0).attr('r', 2).attr('fill', 'blue');
 
 		links.on('mouseover', (event: MouseEvent, d) => {
 			tooltip.style('display', null);

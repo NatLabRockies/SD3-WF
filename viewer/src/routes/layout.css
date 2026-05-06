@@ -15,6 +15,7 @@
 	--fs-md: calc(pow(var(--typography-scale), 1) * var(--typography-base-size));
 	--fs-lg: calc(pow(var(--typography-scale), 2) * var(--typography-base-size));
 	--fs-xl: calc(pow(var(--typography-scale), 3) * var(--typography-base-size));
+	--fs-2xl: calc(pow(var(--typography-scale), 4) * var(--typography-base-size));
 
 	--fw-roman: 400;
 	--fw-bold: 600;

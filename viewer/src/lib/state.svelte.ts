@@ -8,10 +8,19 @@ function round_seconds(value: number) {
 	return Math.floor(value / time_resolution) * time_resolution;
 }
 let timestamp: number = $state(0);
-let feeder: Feeder = $state(await Feeder.load(asset(`/feeders/feeder.buff`)));
-let scenario = $state(await Scenario.load(asset(`/scenarios/api-attack.buff`)));
-let baseline_scenario = $state(await Scenario.load(asset(`/scenarios/baseline.buff`)));
-let seconds_brush: [number, number] = $state([0, scenario.date_to_seconds(scenario.end_date)]);
+let feeder: Feeder = $state(null!);
+let scenario: Scenario = $state(null!);
+let baseline_scenario: Scenario = $state(null!);
+let seconds_brush: [number, number] = $state([0, 0]);
+let ready = $state(false);
+
+export async function init() {
+	feeder = await Feeder.load(asset(`/feeders/feeder.buff`));
+	scenario = await Scenario.load(asset(`/scenarios/api-attack.buff`));
+	baseline_scenario = await Scenario.load(asset(`/scenarios/baseline.buff`));
+	seconds_brush = [0, scenario.date_to_seconds(scenario.end_date)];
+	ready = true;
+}
 
 let play_interval_id: number = $state(0);
 
@@ -36,8 +45,12 @@ function stop() {
 }
 
 export const app_state = {
+	init,
 	play,
 	stop,
+	get ready() {
+		return ready;
+	},
 	get playing() {
 		return play_interval_id != 0;
 	},
