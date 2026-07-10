@@ -89,6 +89,20 @@ class Building:
             / 1000
         )
 
+    @property
+    def facility_active_power(self):
+        return (
+            self.data["Total Active Power:PythonPlugin:OutputVariable [](TimeStep)"]
+            / 1000
+        )
+
+    @property
+    def facility_reactive_power(self):
+        return (
+            self.data["Total Reactive Power:PythonPlugin:OutputVariable [](TimeStep)"]
+            / 1000
+        )
+
     def facility_timeseries(self, start_timestamp: "pd.Timestamp") -> "pd.DataFrame":
         """Return a DataFrame with seconds-since-start as index and 5 battery columns.
 

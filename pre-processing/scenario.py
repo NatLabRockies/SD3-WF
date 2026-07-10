@@ -64,6 +64,13 @@ class Scenario:
             building = Building(building_dir)
             self.buildings[building_dir.name] = building
 
+        traffic_csv = path / "mirrordata.csv"
+        if traffic_csv.exists():
+            self.traffic = pd.read_csv(traffic_csv, index_col=[0]) / 1024
+            self.traffic.index = pd.to_datetime(
+                self.traffic.index, origin=START_TIME, unit="s"
+            )
+            self.traffic = self.traffic[self.traffic.index <= pd.Timestamp(END_TIME)]
         self.load_power_data()
 
     @property
@@ -84,18 +91,12 @@ class Scenario:
             proto_class_key = power_data_mappings[key].get(
                 "proto_class_key", key.title()
             )
-            print("doing key:", key)
             assert hasattr(proto_scenario, proto_class_key)
             proto_data_key = power_data_mappings[key].get("proto_data_key", f"{key}s")
             assert hasattr(proto_scenario, proto_data_key), (
                 f"Scenario does not have attribute '{proto_data_key}'"
             )
             proto_data_mapping = power_data_mappings[key].get("proto_data_mapping", {})
-
-            print(
-                f"Creating object with class: '{proto_class_key}', for list: '{proto_data_key}', in data: '{key}'"
-            )
-            print(f"Column Headers: {list(results.values())[0].columns}")
 
             proto_class = getattr(proto_scenario, proto_class_key)
             proto_data = getattr(proto_scenario, proto_data_key)
@@ -188,7 +189,6 @@ class Scenario:
                 proto_building.timeseries.append(pt)
 
             proto_scenario.buildings.append(proto_building)
-        print(f"  Packed {len(proto_scenario.batteries)} batteries")
 
     def load_power_data(self):
         self.data: dict[str, dict[str, pd.DataFrame]] = {}
@@ -196,6 +196,60 @@ class Scenario:
             glob = arguments.get("glob", f"*.power.{key}.csv")
             file = list(self.grid_dir.glob(glob))[0]
             self.data[key] = read_one_result(file)
+
+        revised_lines = list(self.grid_dir.glob("lines_combined_*.csv"))
+        if len(revised_lines) > 0:
+            lines, buses = read_revised_line(revised_lines[0])
+            self.data["line"] = lines
+            self.data["bus"] = buses
+        else:
+            print("Could not find revised line data")
+
+
+def read_revised_line(
+    file_path,
+) -> tuple[dict[str, pd.DataFrame], dict[str, pd.DataFrame]]:
+    df = pd.read_csv(file_path)
+
+    # df["timestamp"] = pd.to_datetime(
+    #     df["timestamp"], origin=START_TIME, unit="s"
+    # )  # add this
+    df["timestamp"] = pd.to_timedelta(df["timestamp"], unit="s") / pd.Timedelta(
+        1, unit="s"
+    )  # add this
+    df.drop(columns=["to_current", "to_voltage"], inplace=True)
+    line_names = list(df["name"].unique())
+    bus_names = df["bus"].unique()
+    unique_bus_names = {}
+    for bus_name in bus_names:
+        short_bus_name = bus_name[0 : bus_name.find(".")].lower().strip()
+        unique_bus_names[short_bus_name] = bus_name
+        if short_bus_name in line_names:
+            line_names.remove(short_bus_name)
+
+    def process(column: str, name: str) -> pd.DataFrame:
+        filtered_df = df[df[column] == name].copy()
+        filtered_df.index = filtered_df.timestamp
+        filtered_df = filtered_df[~filtered_df.index.duplicated(keep="first")]
+        filtered_df.drop(
+            columns=["name", "bus", "timestamp", "base_voltage_V"], inplace=True
+        )
+        return filtered_df
+
+    return (
+        {
+            name: process("name", name)
+            .drop(columns=["from_current", "from_voltage"])
+            .rename(columns={"from_voltage_pu": "voltage"})
+            for name in line_names
+        },
+        {
+            name: process("bus", id)
+            .drop(columns=["from_current", "from_voltage"])
+            .rename(columns={"from_voltage_pu": "voltage"})
+            for name, id in unique_bus_names.items()
+        },
+    )
 
 
 def read_one_result(file_path) -> dict[str, pd.DataFrame]:
