@@ -16,8 +16,8 @@
 	let time_multiplier_index = $state(5);
 	let time_multiplier = $derived(time_multipliers[time_multiplier_index % time_multipliers.length]);
 
-	onMount(() => {
-		app_state.init();
+	onMount(async () => {
+		await app_state.init();
 	});
 </script>
 

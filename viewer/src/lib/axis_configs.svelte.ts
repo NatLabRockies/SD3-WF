@@ -8,6 +8,8 @@ import type {
 	BatteryTimePoint,
 	BuildingTimePoint,
 	LineTimeSeriesData,
+	BusTimeSeriesData,
+	BusTimePoint,
 	Scenario,
 	LineTimePoint
 } from '$lib/scenario';
@@ -212,6 +214,66 @@ export function line(
 	}[variable_name];
 
 	const a: Axis<LineTimeSeriesData['timeseries'][number]> = {
+		title,
+		units,
+		series: [
+			{
+				name: app_state.scenario.name,
+				color: colors.scenario.to_css(),
+				data: scenario.timeseries || []
+			},
+			{
+				name: app_state.baseline_scenario.name,
+				color: colors.baseline.to_css(),
+				data: baseline.timeseries || []
+			}
+		],
+		y_accessor: (d) => d[variable_name]
+	};
+
+	if (variable_name === 'voltage') {
+		a.y_range = [1.0, 1.05];
+	}
+	return a;
+}
+
+type BusVariable = Exclude<keyof BusTimePoint, 'seconds'>;
+export function bus(id: number, variable_name: BusVariable): Axis<BusTimePoint> | undefined;
+export function bus(
+	baseline: BusTimeSeriesData,
+	scenario: BusTimeSeriesData,
+	variable_name: BusVariable
+): Axis<BusTimePoint>;
+
+export function bus(
+	baseline_or_id: BusTimeSeriesData | number,
+	scenario_or_variable_name: BusTimeSeriesData | BusVariable,
+	variable_name?: BusVariable
+): Axis<BusTimePoint> | undefined {
+	const { baseline, scenario, ...params } = resolve_pair(
+		(s, id) => s.components.get(id) as BusTimeSeriesData,
+		baseline_or_id,
+		scenario_or_variable_name,
+		variable_name
+	);
+	if (!baseline || !scenario) {
+		return undefined;
+	}
+	variable_name = params.variable_name;
+	const title = {
+		voltage: 'Bus Voltage',
+		current: 'Bus Current',
+		active_power: 'Bus Active Power',
+		reactive_power: 'Bus Reactive Power'
+	}[variable_name];
+	const units = {
+		voltage: 'p.u.',
+		current: 'A',
+		active_power: 'kW',
+		reactive_power: 'kVAR'
+	}[variable_name];
+
+	const a: Axis<BusTimeSeriesData['timeseries'][number]> = {
 		title,
 		units,
 		series: [

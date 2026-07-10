@@ -1,5 +1,5 @@
 /*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
-import * as $protobuf from "protobufjs/minimal";
+import $protobuf from "protobufjs/minimal.js";
 
 // Common aliases
 const $Reader = $protobuf.Reader, $util = $protobuf.util;
@@ -39,7 +39,7 @@ export const sd3 = $root.sd3 = (() => {
             this.flows = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
+                    if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
         }
 
@@ -70,9 +70,13 @@ export const sd3 = $root.sd3 = (() => {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        Cyber.decode = function decode(reader, length, error) {
+        Cyber.decode = function decode(reader, length, error, long) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
+            if (long === undefined)
+                long = 0;
+            if (long > $Reader.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Cyber();
             while (reader.pos < end) {
                 let tag = reader.uint32();
@@ -82,17 +86,17 @@ export const sd3 = $root.sd3 = (() => {
                 case 1: {
                         if (!(message.entities && message.entities.length))
                             message.entities = [];
-                        message.entities.push($root.sd3.Cyber.NetworkEntity.decode(reader, reader.uint32()));
+                        message.entities.push($root.sd3.Cyber.NetworkEntity.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 2: {
                         if (!(message.flows && message.flows.length))
                             message.flows = [];
-                        message.flows.push($root.sd3.Cyber.TrafficFlow.decode(reader, reader.uint32()));
+                        message.flows.push($root.sd3.Cyber.TrafficFlow.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 default:
-                    reader.skipType(tag & 7);
+                    reader.skipType(tag & 7, long);
                     break;
                 }
             }
@@ -123,14 +127,18 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        Cyber.verify = function verify(message) {
+        Cyber.verify = function verify(message, long) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                return "maximum nesting depth exceeded";
             if (message.entities != null && message.hasOwnProperty("entities")) {
                 if (!Array.isArray(message.entities))
                     return "entities: array expected";
                 for (let i = 0; i < message.entities.length; ++i) {
-                    let error = $root.sd3.Cyber.NetworkEntity.verify(message.entities[i]);
+                    let error = $root.sd3.Cyber.NetworkEntity.verify(message.entities[i], long + 1);
                     if (error)
                         return "entities." + error;
                 }
@@ -139,7 +147,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.flows))
                     return "flows: array expected";
                 for (let i = 0; i < message.flows.length; ++i) {
-                    let error = $root.sd3.Cyber.TrafficFlow.verify(message.flows[i]);
+                    let error = $root.sd3.Cyber.TrafficFlow.verify(message.flows[i], long + 1);
                     if (error)
                         return "flows." + error;
                 }
@@ -155,9 +163,13 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} object Plain object
          * @returns {sd3.Cyber} Cyber
          */
-        Cyber.fromObject = function fromObject(object) {
+        Cyber.fromObject = function fromObject(object, long) {
             if (object instanceof $root.sd3.Cyber)
                 return object;
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let message = new $root.sd3.Cyber();
             if (object.entities) {
                 if (!Array.isArray(object.entities))
@@ -166,7 +178,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.entities.length; ++i) {
                     if (typeof object.entities[i] !== "object")
                         throw TypeError(".sd3.Cyber.entities: object expected");
-                    message.entities[i] = $root.sd3.Cyber.NetworkEntity.fromObject(object.entities[i]);
+                    message.entities[i] = $root.sd3.Cyber.NetworkEntity.fromObject(object.entities[i], long + 1);
                 }
             }
             if (object.flows) {
@@ -176,7 +188,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.flows.length; ++i) {
                     if (typeof object.flows[i] !== "object")
                         throw TypeError(".sd3.Cyber.flows: object expected");
-                    message.flows[i] = $root.sd3.Cyber.TrafficFlow.fromObject(object.flows[i]);
+                    message.flows[i] = $root.sd3.Cyber.TrafficFlow.fromObject(object.flows[i], long + 1);
                 }
             }
             return message;
@@ -306,7 +318,7 @@ export const sd3 = $root.sd3 = (() => {
             function NetworkEntity(properties) {
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -361,9 +373,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            NetworkEntity.decode = function decode(reader, length, error) {
+            NetworkEntity.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Cyber.NetworkEntity();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -391,7 +407,7 @@ export const sd3 = $root.sd3 = (() => {
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -422,9 +438,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            NetworkEntity.verify = function verify(message) {
+            NetworkEntity.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -451,9 +471,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Cyber.NetworkEntity} NetworkEntity
              */
-            NetworkEntity.fromObject = function fromObject(object) {
+            NetworkEntity.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Cyber.NetworkEntity)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Cyber.NetworkEntity();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -553,7 +577,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -592,9 +616,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            TrafficFlow.decode = function decode(reader, length, error) {
+            TrafficFlow.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Cyber.TrafficFlow();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -612,11 +640,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 3: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Cyber.TrafficFlow.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Cyber.TrafficFlow.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -647,9 +675,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            TrafficFlow.verify = function verify(message) {
+            TrafficFlow.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.sourceId != null && message.hasOwnProperty("sourceId"))
                     if (!$util.isInteger(message.sourceId))
                         return "sourceId: integer expected";
@@ -660,7 +692,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Cyber.TrafficFlow.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Cyber.TrafficFlow.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -676,9 +708,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Cyber.TrafficFlow} TrafficFlow
              */
-            TrafficFlow.fromObject = function fromObject(object) {
+            TrafficFlow.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Cyber.TrafficFlow)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Cyber.TrafficFlow();
                 if (object.sourceId != null)
                     message.sourceId = object.sourceId >>> 0;
@@ -691,7 +727,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Cyber.TrafficFlow.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Cyber.TrafficFlow.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Cyber.TrafficFlow.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -778,7 +814,7 @@ export const sd3 = $root.sd3 = (() => {
                     this.protocols = [];
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -825,9 +861,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Cyber.TrafficFlow.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -849,11 +889,11 @@ export const sd3 = $root.sd3 = (() => {
                         case 4: {
                                 if (!(message.protocols && message.protocols.length))
                                     message.protocols = [];
-                                message.protocols.push($root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown.decode(reader, reader.uint32()));
+                                message.protocols.push($root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown.decode(reader, reader.uint32(), undefined, long + 1));
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -884,9 +924,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -900,7 +944,7 @@ export const sd3 = $root.sd3 = (() => {
                         if (!Array.isArray(message.protocols))
                             return "protocols: array expected";
                         for (let i = 0; i < message.protocols.length; ++i) {
-                            let error = $root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown.verify(message.protocols[i]);
+                            let error = $root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown.verify(message.protocols[i], long + 1);
                             if (error)
                                 return "protocols." + error;
                         }
@@ -916,9 +960,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Cyber.TrafficFlow.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Cyber.TrafficFlow.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Cyber.TrafficFlow.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -933,7 +981,7 @@ export const sd3 = $root.sd3 = (() => {
                         for (let i = 0; i < object.protocols.length; ++i) {
                             if (typeof object.protocols[i] !== "object")
                                 throw TypeError(".sd3.Cyber.TrafficFlow.TimePoint.protocols: object expected");
-                            message.protocols[i] = $root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown.fromObject(object.protocols[i]);
+                            message.protocols[i] = $root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown.fromObject(object.protocols[i], long + 1);
                         }
                     }
                     return message;
@@ -1023,7 +1071,7 @@ export const sd3 = $root.sd3 = (() => {
                     function ProtocolBreakdown(properties) {
                         if (properties)
                             for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                                if (properties[keys[i]] != null)
+                                if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                     this[keys[i]] = properties[keys[i]];
                     }
 
@@ -1078,9 +1126,13 @@ export const sd3 = $root.sd3 = (() => {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    ProtocolBreakdown.decode = function decode(reader, length, error) {
+                    ProtocolBreakdown.decode = function decode(reader, length, error, long) {
                         if (!(reader instanceof $Reader))
                             reader = $Reader.create(reader);
+                        if (long === undefined)
+                            long = 0;
+                        if (long > $Reader.recursionLimit)
+                            throw Error("maximum nesting depth exceeded");
                         let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown();
                         while (reader.pos < end) {
                             let tag = reader.uint32();
@@ -1108,7 +1160,7 @@ export const sd3 = $root.sd3 = (() => {
                                     break;
                                 }
                             default:
-                                reader.skipType(tag & 7);
+                                reader.skipType(tag & 7, long);
                                 break;
                             }
                         }
@@ -1139,9 +1191,13 @@ export const sd3 = $root.sd3 = (() => {
                      * @param {Object.<string,*>} message Plain object to verify
                      * @returns {string|null} `null` if valid, otherwise the reason why it is not
                      */
-                    ProtocolBreakdown.verify = function verify(message) {
+                    ProtocolBreakdown.verify = function verify(message, long) {
                         if (typeof message !== "object" || message === null)
                             return "object expected";
+                        if (long === undefined)
+                            long = 0;
+                        if (long > $util.recursionLimit)
+                            return "maximum nesting depth exceeded";
                         if (message.transport != null && message.hasOwnProperty("transport"))
                             switch (message.transport) {
                             default:
@@ -1186,9 +1242,13 @@ export const sd3 = $root.sd3 = (() => {
                      * @param {Object.<string,*>} object Plain object
                      * @returns {sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown} ProtocolBreakdown
                      */
-                    ProtocolBreakdown.fromObject = function fromObject(object) {
+                    ProtocolBreakdown.fromObject = function fromObject(object, long) {
                         if (object instanceof $root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown)
                             return object;
+                        if (long === undefined)
+                            long = 0;
+                        if (long > $util.recursionLimit)
+                            throw Error("maximum nesting depth exceeded");
                         let message = new $root.sd3.Cyber.TrafficFlow.TimePoint.ProtocolBreakdown();
                         switch (object.transport) {
                         default:
@@ -1377,7 +1437,7 @@ export const sd3 = $root.sd3 = (() => {
             this.buildings = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
+                    if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
         }
 
@@ -1504,9 +1564,13 @@ export const sd3 = $root.sd3 = (() => {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        Scenario.decode = function decode(reader, length, error) {
+        Scenario.decode = function decode(reader, length, error, long) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
+            if (long === undefined)
+                long = 0;
+            if (long > $Reader.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario();
             while (reader.pos < end) {
                 let tag = reader.uint32();
@@ -1520,49 +1584,49 @@ export const sd3 = $root.sd3 = (() => {
                 case 2: {
                         if (!(message.lines && message.lines.length))
                             message.lines = [];
-                        message.lines.push($root.sd3.Scenario.Line.decode(reader, reader.uint32()));
+                        message.lines.push($root.sd3.Scenario.Line.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 3: {
                         if (!(message.transformers && message.transformers.length))
                             message.transformers = [];
-                        message.transformers.push($root.sd3.Scenario.Transformer.decode(reader, reader.uint32()));
+                        message.transformers.push($root.sd3.Scenario.Transformer.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 4: {
                         if (!(message.loads && message.loads.length))
                             message.loads = [];
-                        message.loads.push($root.sd3.Scenario.Load.decode(reader, reader.uint32()));
+                        message.loads.push($root.sd3.Scenario.Load.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 5: {
                         if (!(message.buses && message.buses.length))
                             message.buses = [];
-                        message.buses.push($root.sd3.Scenario.Bus.decode(reader, reader.uint32()));
+                        message.buses.push($root.sd3.Scenario.Bus.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 6: {
                         if (!(message.breakers && message.breakers.length))
                             message.breakers = [];
-                        message.breakers.push($root.sd3.Scenario.Breaker.decode(reader, reader.uint32()));
+                        message.breakers.push($root.sd3.Scenario.Breaker.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 7: {
                         if (!(message.circuits && message.circuits.length))
                             message.circuits = [];
-                        message.circuits.push($root.sd3.Scenario.Circuit.decode(reader, reader.uint32()));
+                        message.circuits.push($root.sd3.Scenario.Circuit.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 8: {
                         if (!(message.regulators && message.regulators.length))
                             message.regulators = [];
-                        message.regulators.push($root.sd3.Scenario.Regulator.decode(reader, reader.uint32()));
+                        message.regulators.push($root.sd3.Scenario.Regulator.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 9: {
                         if (!(message.capacitors && message.capacitors.length))
                             message.capacitors = [];
-                        message.capacitors.push($root.sd3.Scenario.Capacitor.decode(reader, reader.uint32()));
+                        message.capacitors.push($root.sd3.Scenario.Capacitor.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 10: {
@@ -1574,23 +1638,23 @@ export const sd3 = $root.sd3 = (() => {
                         break;
                     }
                 case 12: {
-                        message.cyber = $root.sd3.Cyber.decode(reader, reader.uint32());
+                        message.cyber = $root.sd3.Cyber.decode(reader, reader.uint32(), undefined, long + 1);
                         break;
                     }
                 case 13: {
                         if (!(message.batteries && message.batteries.length))
                             message.batteries = [];
-                        message.batteries.push($root.sd3.Scenario.Battery.decode(reader, reader.uint32()));
+                        message.batteries.push($root.sd3.Scenario.Battery.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 14: {
                         if (!(message.buildings && message.buildings.length))
                             message.buildings = [];
-                        message.buildings.push($root.sd3.Scenario.Building.decode(reader, reader.uint32()));
+                        message.buildings.push($root.sd3.Scenario.Building.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 default:
-                    reader.skipType(tag & 7);
+                    reader.skipType(tag & 7, long);
                     break;
                 }
             }
@@ -1621,9 +1685,13 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        Scenario.verify = function verify(message) {
+        Scenario.verify = function verify(message, long) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                return "maximum nesting depth exceeded";
             if (message.name != null && message.hasOwnProperty("name"))
                 if (!$util.isString(message.name))
                     return "name: string expected";
@@ -1631,7 +1699,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.lines))
                     return "lines: array expected";
                 for (let i = 0; i < message.lines.length; ++i) {
-                    let error = $root.sd3.Scenario.Line.verify(message.lines[i]);
+                    let error = $root.sd3.Scenario.Line.verify(message.lines[i], long + 1);
                     if (error)
                         return "lines." + error;
                 }
@@ -1640,7 +1708,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.transformers))
                     return "transformers: array expected";
                 for (let i = 0; i < message.transformers.length; ++i) {
-                    let error = $root.sd3.Scenario.Transformer.verify(message.transformers[i]);
+                    let error = $root.sd3.Scenario.Transformer.verify(message.transformers[i], long + 1);
                     if (error)
                         return "transformers." + error;
                 }
@@ -1649,7 +1717,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.loads))
                     return "loads: array expected";
                 for (let i = 0; i < message.loads.length; ++i) {
-                    let error = $root.sd3.Scenario.Load.verify(message.loads[i]);
+                    let error = $root.sd3.Scenario.Load.verify(message.loads[i], long + 1);
                     if (error)
                         return "loads." + error;
                 }
@@ -1658,7 +1726,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.buses))
                     return "buses: array expected";
                 for (let i = 0; i < message.buses.length; ++i) {
-                    let error = $root.sd3.Scenario.Bus.verify(message.buses[i]);
+                    let error = $root.sd3.Scenario.Bus.verify(message.buses[i], long + 1);
                     if (error)
                         return "buses." + error;
                 }
@@ -1667,7 +1735,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.breakers))
                     return "breakers: array expected";
                 for (let i = 0; i < message.breakers.length; ++i) {
-                    let error = $root.sd3.Scenario.Breaker.verify(message.breakers[i]);
+                    let error = $root.sd3.Scenario.Breaker.verify(message.breakers[i], long + 1);
                     if (error)
                         return "breakers." + error;
                 }
@@ -1676,7 +1744,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.circuits))
                     return "circuits: array expected";
                 for (let i = 0; i < message.circuits.length; ++i) {
-                    let error = $root.sd3.Scenario.Circuit.verify(message.circuits[i]);
+                    let error = $root.sd3.Scenario.Circuit.verify(message.circuits[i], long + 1);
                     if (error)
                         return "circuits." + error;
                 }
@@ -1685,7 +1753,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.regulators))
                     return "regulators: array expected";
                 for (let i = 0; i < message.regulators.length; ++i) {
-                    let error = $root.sd3.Scenario.Regulator.verify(message.regulators[i]);
+                    let error = $root.sd3.Scenario.Regulator.verify(message.regulators[i], long + 1);
                     if (error)
                         return "regulators." + error;
                 }
@@ -1694,7 +1762,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.capacitors))
                     return "capacitors: array expected";
                 for (let i = 0; i < message.capacitors.length; ++i) {
-                    let error = $root.sd3.Scenario.Capacitor.verify(message.capacitors[i]);
+                    let error = $root.sd3.Scenario.Capacitor.verify(message.capacitors[i], long + 1);
                     if (error)
                         return "capacitors." + error;
                 }
@@ -1706,7 +1774,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!$util.isInteger(message.endTime) && !(message.endTime && $util.isInteger(message.endTime.low) && $util.isInteger(message.endTime.high)))
                     return "endTime: integer|Long expected";
             if (message.cyber != null && message.hasOwnProperty("cyber")) {
-                let error = $root.sd3.Cyber.verify(message.cyber);
+                let error = $root.sd3.Cyber.verify(message.cyber, long + 1);
                 if (error)
                     return "cyber." + error;
             }
@@ -1714,7 +1782,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.batteries))
                     return "batteries: array expected";
                 for (let i = 0; i < message.batteries.length; ++i) {
-                    let error = $root.sd3.Scenario.Battery.verify(message.batteries[i]);
+                    let error = $root.sd3.Scenario.Battery.verify(message.batteries[i], long + 1);
                     if (error)
                         return "batteries." + error;
                 }
@@ -1723,7 +1791,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.buildings))
                     return "buildings: array expected";
                 for (let i = 0; i < message.buildings.length; ++i) {
-                    let error = $root.sd3.Scenario.Building.verify(message.buildings[i]);
+                    let error = $root.sd3.Scenario.Building.verify(message.buildings[i], long + 1);
                     if (error)
                         return "buildings." + error;
                 }
@@ -1739,9 +1807,13 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} object Plain object
          * @returns {sd3.Scenario} Scenario
          */
-        Scenario.fromObject = function fromObject(object) {
+        Scenario.fromObject = function fromObject(object, long) {
             if (object instanceof $root.sd3.Scenario)
                 return object;
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let message = new $root.sd3.Scenario();
             if (object.name != null)
                 message.name = String(object.name);
@@ -1752,7 +1824,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.lines.length; ++i) {
                     if (typeof object.lines[i] !== "object")
                         throw TypeError(".sd3.Scenario.lines: object expected");
-                    message.lines[i] = $root.sd3.Scenario.Line.fromObject(object.lines[i]);
+                    message.lines[i] = $root.sd3.Scenario.Line.fromObject(object.lines[i], long + 1);
                 }
             }
             if (object.transformers) {
@@ -1762,7 +1834,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.transformers.length; ++i) {
                     if (typeof object.transformers[i] !== "object")
                         throw TypeError(".sd3.Scenario.transformers: object expected");
-                    message.transformers[i] = $root.sd3.Scenario.Transformer.fromObject(object.transformers[i]);
+                    message.transformers[i] = $root.sd3.Scenario.Transformer.fromObject(object.transformers[i], long + 1);
                 }
             }
             if (object.loads) {
@@ -1772,7 +1844,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.loads.length; ++i) {
                     if (typeof object.loads[i] !== "object")
                         throw TypeError(".sd3.Scenario.loads: object expected");
-                    message.loads[i] = $root.sd3.Scenario.Load.fromObject(object.loads[i]);
+                    message.loads[i] = $root.sd3.Scenario.Load.fromObject(object.loads[i], long + 1);
                 }
             }
             if (object.buses) {
@@ -1782,7 +1854,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.buses.length; ++i) {
                     if (typeof object.buses[i] !== "object")
                         throw TypeError(".sd3.Scenario.buses: object expected");
-                    message.buses[i] = $root.sd3.Scenario.Bus.fromObject(object.buses[i]);
+                    message.buses[i] = $root.sd3.Scenario.Bus.fromObject(object.buses[i], long + 1);
                 }
             }
             if (object.breakers) {
@@ -1792,7 +1864,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.breakers.length; ++i) {
                     if (typeof object.breakers[i] !== "object")
                         throw TypeError(".sd3.Scenario.breakers: object expected");
-                    message.breakers[i] = $root.sd3.Scenario.Breaker.fromObject(object.breakers[i]);
+                    message.breakers[i] = $root.sd3.Scenario.Breaker.fromObject(object.breakers[i], long + 1);
                 }
             }
             if (object.circuits) {
@@ -1802,7 +1874,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.circuits.length; ++i) {
                     if (typeof object.circuits[i] !== "object")
                         throw TypeError(".sd3.Scenario.circuits: object expected");
-                    message.circuits[i] = $root.sd3.Scenario.Circuit.fromObject(object.circuits[i]);
+                    message.circuits[i] = $root.sd3.Scenario.Circuit.fromObject(object.circuits[i], long + 1);
                 }
             }
             if (object.regulators) {
@@ -1812,7 +1884,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.regulators.length; ++i) {
                     if (typeof object.regulators[i] !== "object")
                         throw TypeError(".sd3.Scenario.regulators: object expected");
-                    message.regulators[i] = $root.sd3.Scenario.Regulator.fromObject(object.regulators[i]);
+                    message.regulators[i] = $root.sd3.Scenario.Regulator.fromObject(object.regulators[i], long + 1);
                 }
             }
             if (object.capacitors) {
@@ -1822,7 +1894,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.capacitors.length; ++i) {
                     if (typeof object.capacitors[i] !== "object")
                         throw TypeError(".sd3.Scenario.capacitors: object expected");
-                    message.capacitors[i] = $root.sd3.Scenario.Capacitor.fromObject(object.capacitors[i]);
+                    message.capacitors[i] = $root.sd3.Scenario.Capacitor.fromObject(object.capacitors[i], long + 1);
                 }
             }
             if (object.startTime != null)
@@ -1846,7 +1918,7 @@ export const sd3 = $root.sd3 = (() => {
             if (object.cyber != null) {
                 if (typeof object.cyber !== "object")
                     throw TypeError(".sd3.Scenario.cyber: object expected");
-                message.cyber = $root.sd3.Cyber.fromObject(object.cyber);
+                message.cyber = $root.sd3.Cyber.fromObject(object.cyber, long + 1);
             }
             if (object.batteries) {
                 if (!Array.isArray(object.batteries))
@@ -1855,7 +1927,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.batteries.length; ++i) {
                     if (typeof object.batteries[i] !== "object")
                         throw TypeError(".sd3.Scenario.batteries: object expected");
-                    message.batteries[i] = $root.sd3.Scenario.Battery.fromObject(object.batteries[i]);
+                    message.batteries[i] = $root.sd3.Scenario.Battery.fromObject(object.batteries[i], long + 1);
                 }
             }
             if (object.buildings) {
@@ -1865,7 +1937,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.buildings.length; ++i) {
                     if (typeof object.buildings[i] !== "object")
                         throw TypeError(".sd3.Scenario.buildings: object expected");
-                    message.buildings[i] = $root.sd3.Scenario.Building.fromObject(object.buildings[i]);
+                    message.buildings[i] = $root.sd3.Scenario.Building.fromObject(object.buildings[i], long + 1);
                 }
             }
             return message;
@@ -2025,7 +2097,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -2056,9 +2128,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Line.decode = function decode(reader, length, error) {
+            Line.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Line();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -2072,11 +2148,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Line.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Line.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -2107,9 +2183,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Line.verify = function verify(message) {
+            Line.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -2117,7 +2197,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Line.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Line.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -2133,9 +2213,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Line} Line
              */
-            Line.fromObject = function fromObject(object) {
+            Line.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Line)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Line();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -2146,7 +2230,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Line.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Line.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Line.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -2229,7 +2313,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -2284,9 +2368,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Line.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -2314,7 +2402,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -2345,9 +2433,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -2374,9 +2466,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Line.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Line.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Line.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -2478,7 +2574,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -2509,9 +2605,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Transformer.decode = function decode(reader, length, error) {
+            Transformer.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Transformer();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -2525,11 +2625,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Transformer.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Transformer.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -2560,9 +2660,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Transformer.verify = function verify(message) {
+            Transformer.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -2570,7 +2674,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Transformer.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Transformer.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -2586,9 +2690,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Transformer} Transformer
              */
-            Transformer.fromObject = function fromObject(object) {
+            Transformer.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Transformer)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Transformer();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -2599,7 +2707,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Transformer.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Transformer.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Transformer.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -2682,7 +2790,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -2737,9 +2845,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Transformer.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -2767,7 +2879,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -2798,9 +2910,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -2827,9 +2943,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Transformer.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Transformer.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Transformer.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -2931,7 +3051,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -2962,9 +3082,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Load.decode = function decode(reader, length, error) {
+            Load.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Load();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -2978,11 +3102,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Load.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Load.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -3013,9 +3137,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Load.verify = function verify(message) {
+            Load.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -3023,7 +3151,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Load.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Load.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -3039,9 +3167,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Load} Load
              */
-            Load.fromObject = function fromObject(object) {
+            Load.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Load)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Load();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -3052,7 +3184,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Load.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Load.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Load.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -3135,7 +3267,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -3190,9 +3322,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Load.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -3220,7 +3356,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -3251,9 +3387,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -3280,9 +3420,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Load.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Load.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Load.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -3384,7 +3528,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -3415,9 +3559,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Bus.decode = function decode(reader, length, error) {
+            Bus.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Bus();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -3431,11 +3579,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Bus.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Bus.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -3466,9 +3614,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Bus.verify = function verify(message) {
+            Bus.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -3476,7 +3628,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Bus.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Bus.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -3492,9 +3644,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Bus} Bus
              */
-            Bus.fromObject = function fromObject(object) {
+            Bus.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Bus)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Bus();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -3505,7 +3661,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Bus.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Bus.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Bus.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -3585,7 +3741,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -3616,9 +3772,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Bus.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -3634,7 +3794,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -3665,9 +3825,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -3685,9 +3849,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Bus.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Bus.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Bus.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -3774,7 +3942,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -3805,9 +3973,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Breaker.decode = function decode(reader, length, error) {
+            Breaker.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Breaker();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -3821,11 +3993,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Breaker.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Breaker.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -3856,9 +4028,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Breaker.verify = function verify(message) {
+            Breaker.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -3866,7 +4042,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Breaker.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Breaker.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -3882,9 +4058,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Breaker} Breaker
              */
-            Breaker.fromObject = function fromObject(object) {
+            Breaker.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Breaker)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Breaker();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -3895,7 +4075,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Breaker.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Breaker.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Breaker.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -3978,7 +4158,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -4033,9 +4213,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Breaker.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -4063,7 +4247,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -4094,9 +4278,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -4123,9 +4311,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Breaker.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Breaker.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Breaker.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -4227,7 +4419,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -4258,9 +4450,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Regulator.decode = function decode(reader, length, error) {
+            Regulator.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Regulator();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -4274,11 +4470,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Regulator.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Regulator.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -4309,9 +4505,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Regulator.verify = function verify(message) {
+            Regulator.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -4319,7 +4519,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Regulator.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Regulator.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -4335,9 +4535,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Regulator} Regulator
              */
-            Regulator.fromObject = function fromObject(object) {
+            Regulator.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Regulator)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Regulator();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -4348,7 +4552,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Regulator.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Regulator.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Regulator.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -4431,7 +4635,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -4486,9 +4690,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Regulator.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -4516,7 +4724,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -4547,9 +4755,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -4576,9 +4788,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Regulator.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Regulator.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Regulator.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -4680,7 +4896,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -4711,9 +4927,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Capacitor.decode = function decode(reader, length, error) {
+            Capacitor.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Capacitor();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -4727,11 +4947,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Capacitor.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Capacitor.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -4762,9 +4982,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Capacitor.verify = function verify(message) {
+            Capacitor.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -4772,7 +4996,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Capacitor.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Capacitor.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -4788,9 +5012,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Capacitor} Capacitor
              */
-            Capacitor.fromObject = function fromObject(object) {
+            Capacitor.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Capacitor)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Capacitor();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -4801,7 +5029,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Capacitor.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Capacitor.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Capacitor.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -4883,7 +5111,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -4930,9 +5158,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Capacitor.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -4956,7 +5188,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -4987,9 +5219,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -5013,9 +5249,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Capacitor.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Capacitor.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Capacitor.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -5112,7 +5352,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -5143,9 +5383,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Circuit.decode = function decode(reader, length, error) {
+            Circuit.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Circuit();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -5159,11 +5403,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Circuit.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Circuit.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -5194,9 +5438,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Circuit.verify = function verify(message) {
+            Circuit.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -5204,7 +5452,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Circuit.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Circuit.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -5220,9 +5468,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Circuit} Circuit
              */
-            Circuit.fromObject = function fromObject(object) {
+            Circuit.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Circuit)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Circuit();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -5233,7 +5485,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Circuit.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Circuit.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Circuit.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -5314,7 +5566,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -5353,9 +5605,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Circuit.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -5375,7 +5631,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -5406,9 +5662,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -5429,9 +5689,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Circuit.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Circuit.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Circuit.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -5523,7 +5787,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -5554,9 +5818,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Battery.decode = function decode(reader, length, error) {
+            Battery.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Battery();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -5570,11 +5838,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Battery.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Battery.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -5605,9 +5873,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Battery.verify = function verify(message) {
+            Battery.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -5615,7 +5887,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Battery.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Battery.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -5631,9 +5903,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Battery} Battery
              */
-            Battery.fromObject = function fromObject(object) {
+            Battery.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Battery)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Battery();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -5644,7 +5920,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Battery.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Battery.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Battery.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -5744,7 +6020,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -5807,9 +6083,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Battery.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -5841,7 +6121,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -5872,9 +6152,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -5910,9 +6194,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Battery.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Battery.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Battery.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -6037,7 +6325,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.timeseries = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -6068,9 +6356,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Building.decode = function decode(reader, length, error) {
+            Building.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Building();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -6084,11 +6376,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.timeseries && message.timeseries.length))
                                 message.timeseries = [];
-                            message.timeseries.push($root.sd3.Scenario.Building.TimePoint.decode(reader, reader.uint32()));
+                            message.timeseries.push($root.sd3.Scenario.Building.TimePoint.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -6119,9 +6411,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Building.verify = function verify(message) {
+            Building.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -6129,7 +6425,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.timeseries))
                         return "timeseries: array expected";
                     for (let i = 0; i < message.timeseries.length; ++i) {
-                        let error = $root.sd3.Scenario.Building.TimePoint.verify(message.timeseries[i]);
+                        let error = $root.sd3.Scenario.Building.TimePoint.verify(message.timeseries[i], long + 1);
                         if (error)
                             return "timeseries." + error;
                     }
@@ -6145,9 +6441,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Scenario.Building} Building
              */
-            Building.fromObject = function fromObject(object) {
+            Building.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Scenario.Building)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Scenario.Building();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -6158,7 +6458,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.timeseries.length; ++i) {
                         if (typeof object.timeseries[i] !== "object")
                             throw TypeError(".sd3.Scenario.Building.timeseries: object expected");
-                        message.timeseries[i] = $root.sd3.Scenario.Building.TimePoint.fromObject(object.timeseries[i]);
+                        message.timeseries[i] = $root.sd3.Scenario.Building.TimePoint.fromObject(object.timeseries[i], long + 1);
                     }
                 }
                 return message;
@@ -6241,7 +6541,7 @@ export const sd3 = $root.sd3 = (() => {
                 function TimePoint(properties) {
                     if (properties)
                         for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
+                            if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
                 }
 
@@ -6296,9 +6596,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                TimePoint.decode = function decode(reader, length, error) {
+                TimePoint.decode = function decode(reader, length, error, long) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $Reader.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Scenario.Building.TimePoint();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
@@ -6326,7 +6630,7 @@ export const sd3 = $root.sd3 = (() => {
                                 break;
                             }
                         default:
-                            reader.skipType(tag & 7);
+                            reader.skipType(tag & 7, long);
                             break;
                         }
                     }
@@ -6357,9 +6661,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                TimePoint.verify = function verify(message) {
+                TimePoint.verify = function verify(message, long) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        return "maximum nesting depth exceeded";
                     if (message.seconds != null && message.hasOwnProperty("seconds"))
                         if (!$util.isInteger(message.seconds))
                             return "seconds: integer expected";
@@ -6386,9 +6694,13 @@ export const sd3 = $root.sd3 = (() => {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {sd3.Scenario.Building.TimePoint} TimePoint
                  */
-                TimePoint.fromObject = function fromObject(object) {
+                TimePoint.fromObject = function fromObject(object, long) {
                     if (object instanceof $root.sd3.Scenario.Building.TimePoint)
                         return object;
+                    if (long === undefined)
+                        long = 0;
+                    if (long > $util.recursionLimit)
+                        throw Error("maximum nesting depth exceeded");
                     let message = new $root.sd3.Scenario.Building.TimePoint();
                     if (object.seconds != null)
                         message.seconds = object.seconds >>> 0;
@@ -6494,7 +6806,7 @@ export const sd3 = $root.sd3 = (() => {
         function BusConnection(properties) {
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
+                    if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
         }
 
@@ -6541,9 +6853,13 @@ export const sd3 = $root.sd3 = (() => {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        BusConnection.decode = function decode(reader, length, error) {
+        BusConnection.decode = function decode(reader, length, error, long) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
+            if (long === undefined)
+                long = 0;
+            if (long > $Reader.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.BusConnection();
             while (reader.pos < end) {
                 let tag = reader.uint32();
@@ -6567,7 +6883,7 @@ export const sd3 = $root.sd3 = (() => {
                         break;
                     }
                 default:
-                    reader.skipType(tag & 7);
+                    reader.skipType(tag & 7, long);
                     break;
                 }
             }
@@ -6598,9 +6914,13 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        BusConnection.verify = function verify(message) {
+        BusConnection.verify = function verify(message, long) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                return "maximum nesting depth exceeded";
             if (message.busId != null && message.hasOwnProperty("busId"))
                 if (!$util.isInteger(message.busId))
                     return "busId: integer expected";
@@ -6624,9 +6944,13 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} object Plain object
          * @returns {sd3.BusConnection} BusConnection
          */
-        BusConnection.fromObject = function fromObject(object) {
+        BusConnection.fromObject = function fromObject(object, long) {
             if (object instanceof $root.sd3.BusConnection)
                 return object;
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let message = new $root.sd3.BusConnection();
             if (object.busId != null)
                 message.busId = object.busId >>> 0;
@@ -6730,7 +7054,7 @@ export const sd3 = $root.sd3 = (() => {
             this.buses = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
+                    if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
         }
 
@@ -6801,9 +7125,13 @@ export const sd3 = $root.sd3 = (() => {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        Feeder.decode = function decode(reader, length, error) {
+        Feeder.decode = function decode(reader, length, error, long) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
+            if (long === undefined)
+                long = 0;
+            if (long > $Reader.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Feeder();
             while (reader.pos < end) {
                 let tag = reader.uint32();
@@ -6817,41 +7145,41 @@ export const sd3 = $root.sd3 = (() => {
                 case 2: {
                         if (!(message.lines && message.lines.length))
                             message.lines = [];
-                        message.lines.push($root.sd3.Feeder.Line.decode(reader, reader.uint32()));
+                        message.lines.push($root.sd3.Feeder.Line.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 3: {
                         if (!(message.loads && message.loads.length))
                             message.loads = [];
-                        message.loads.push($root.sd3.Feeder.Load.decode(reader, reader.uint32()));
+                        message.loads.push($root.sd3.Feeder.Load.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 4: {
                         if (!(message.capacitors && message.capacitors.length))
                             message.capacitors = [];
-                        message.capacitors.push($root.sd3.Feeder.Capacitor.decode(reader, reader.uint32()));
+                        message.capacitors.push($root.sd3.Feeder.Capacitor.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 5: {
                         if (!(message.regulators && message.regulators.length))
                             message.regulators = [];
-                        message.regulators.push($root.sd3.Feeder.Regulator.decode(reader, reader.uint32()));
+                        message.regulators.push($root.sd3.Feeder.Regulator.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 6: {
                         if (!(message.transformers && message.transformers.length))
                             message.transformers = [];
-                        message.transformers.push($root.sd3.Feeder.Transformer.decode(reader, reader.uint32()));
+                        message.transformers.push($root.sd3.Feeder.Transformer.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 case 7: {
                         if (!(message.buses && message.buses.length))
                             message.buses = [];
-                        message.buses.push($root.sd3.Feeder.Bus.decode(reader, reader.uint32()));
+                        message.buses.push($root.sd3.Feeder.Bus.decode(reader, reader.uint32(), undefined, long + 1));
                         break;
                     }
                 default:
-                    reader.skipType(tag & 7);
+                    reader.skipType(tag & 7, long);
                     break;
                 }
             }
@@ -6882,9 +7210,13 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        Feeder.verify = function verify(message) {
+        Feeder.verify = function verify(message, long) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                return "maximum nesting depth exceeded";
             if (message.sourceBusId != null && message.hasOwnProperty("sourceBusId"))
                 if (!$util.isInteger(message.sourceBusId))
                     return "sourceBusId: integer expected";
@@ -6892,7 +7224,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.lines))
                     return "lines: array expected";
                 for (let i = 0; i < message.lines.length; ++i) {
-                    let error = $root.sd3.Feeder.Line.verify(message.lines[i]);
+                    let error = $root.sd3.Feeder.Line.verify(message.lines[i], long + 1);
                     if (error)
                         return "lines." + error;
                 }
@@ -6901,7 +7233,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.loads))
                     return "loads: array expected";
                 for (let i = 0; i < message.loads.length; ++i) {
-                    let error = $root.sd3.Feeder.Load.verify(message.loads[i]);
+                    let error = $root.sd3.Feeder.Load.verify(message.loads[i], long + 1);
                     if (error)
                         return "loads." + error;
                 }
@@ -6910,7 +7242,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.capacitors))
                     return "capacitors: array expected";
                 for (let i = 0; i < message.capacitors.length; ++i) {
-                    let error = $root.sd3.Feeder.Capacitor.verify(message.capacitors[i]);
+                    let error = $root.sd3.Feeder.Capacitor.verify(message.capacitors[i], long + 1);
                     if (error)
                         return "capacitors." + error;
                 }
@@ -6919,7 +7251,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.regulators))
                     return "regulators: array expected";
                 for (let i = 0; i < message.regulators.length; ++i) {
-                    let error = $root.sd3.Feeder.Regulator.verify(message.regulators[i]);
+                    let error = $root.sd3.Feeder.Regulator.verify(message.regulators[i], long + 1);
                     if (error)
                         return "regulators." + error;
                 }
@@ -6928,7 +7260,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.transformers))
                     return "transformers: array expected";
                 for (let i = 0; i < message.transformers.length; ++i) {
-                    let error = $root.sd3.Feeder.Transformer.verify(message.transformers[i]);
+                    let error = $root.sd3.Feeder.Transformer.verify(message.transformers[i], long + 1);
                     if (error)
                         return "transformers." + error;
                 }
@@ -6937,7 +7269,7 @@ export const sd3 = $root.sd3 = (() => {
                 if (!Array.isArray(message.buses))
                     return "buses: array expected";
                 for (let i = 0; i < message.buses.length; ++i) {
-                    let error = $root.sd3.Feeder.Bus.verify(message.buses[i]);
+                    let error = $root.sd3.Feeder.Bus.verify(message.buses[i], long + 1);
                     if (error)
                         return "buses." + error;
                 }
@@ -6953,9 +7285,13 @@ export const sd3 = $root.sd3 = (() => {
          * @param {Object.<string,*>} object Plain object
          * @returns {sd3.Feeder} Feeder
          */
-        Feeder.fromObject = function fromObject(object) {
+        Feeder.fromObject = function fromObject(object, long) {
             if (object instanceof $root.sd3.Feeder)
                 return object;
+            if (long === undefined)
+                long = 0;
+            if (long > $util.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
             let message = new $root.sd3.Feeder();
             if (object.sourceBusId != null)
                 message.sourceBusId = object.sourceBusId >>> 0;
@@ -6966,7 +7302,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.lines.length; ++i) {
                     if (typeof object.lines[i] !== "object")
                         throw TypeError(".sd3.Feeder.lines: object expected");
-                    message.lines[i] = $root.sd3.Feeder.Line.fromObject(object.lines[i]);
+                    message.lines[i] = $root.sd3.Feeder.Line.fromObject(object.lines[i], long + 1);
                 }
             }
             if (object.loads) {
@@ -6976,7 +7312,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.loads.length; ++i) {
                     if (typeof object.loads[i] !== "object")
                         throw TypeError(".sd3.Feeder.loads: object expected");
-                    message.loads[i] = $root.sd3.Feeder.Load.fromObject(object.loads[i]);
+                    message.loads[i] = $root.sd3.Feeder.Load.fromObject(object.loads[i], long + 1);
                 }
             }
             if (object.capacitors) {
@@ -6986,7 +7322,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.capacitors.length; ++i) {
                     if (typeof object.capacitors[i] !== "object")
                         throw TypeError(".sd3.Feeder.capacitors: object expected");
-                    message.capacitors[i] = $root.sd3.Feeder.Capacitor.fromObject(object.capacitors[i]);
+                    message.capacitors[i] = $root.sd3.Feeder.Capacitor.fromObject(object.capacitors[i], long + 1);
                 }
             }
             if (object.regulators) {
@@ -6996,7 +7332,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.regulators.length; ++i) {
                     if (typeof object.regulators[i] !== "object")
                         throw TypeError(".sd3.Feeder.regulators: object expected");
-                    message.regulators[i] = $root.sd3.Feeder.Regulator.fromObject(object.regulators[i]);
+                    message.regulators[i] = $root.sd3.Feeder.Regulator.fromObject(object.regulators[i], long + 1);
                 }
             }
             if (object.transformers) {
@@ -7006,7 +7342,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.transformers.length; ++i) {
                     if (typeof object.transformers[i] !== "object")
                         throw TypeError(".sd3.Feeder.transformers: object expected");
-                    message.transformers[i] = $root.sd3.Feeder.Transformer.fromObject(object.transformers[i]);
+                    message.transformers[i] = $root.sd3.Feeder.Transformer.fromObject(object.transformers[i], long + 1);
                 }
             }
             if (object.buses) {
@@ -7016,7 +7352,7 @@ export const sd3 = $root.sd3 = (() => {
                 for (let i = 0; i < object.buses.length; ++i) {
                     if (typeof object.buses[i] !== "object")
                         throw TypeError(".sd3.Feeder.buses: object expected");
-                    message.buses[i] = $root.sd3.Feeder.Bus.fromObject(object.buses[i]);
+                    message.buses[i] = $root.sd3.Feeder.Bus.fromObject(object.buses[i], long + 1);
                 }
             }
             return message;
@@ -7128,7 +7464,7 @@ export const sd3 = $root.sd3 = (() => {
             function Bus(properties) {
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -7167,9 +7503,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Bus.decode = function decode(reader, length, error) {
+            Bus.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Feeder.Bus();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -7189,7 +7529,7 @@ export const sd3 = $root.sd3 = (() => {
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -7220,9 +7560,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Bus.verify = function verify(message) {
+            Bus.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -7243,9 +7587,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Feeder.Bus} Bus
              */
-            Bus.fromObject = function fromObject(object) {
+            Bus.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Feeder.Bus)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Feeder.Bus();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -7337,7 +7685,7 @@ export const sd3 = $root.sd3 = (() => {
             function Line(properties) {
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -7400,9 +7748,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Line.decode = function decode(reader, length, error) {
+            Line.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Feeder.Line();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -7414,11 +7766,11 @@ export const sd3 = $root.sd3 = (() => {
                             break;
                         }
                     case 2: {
-                            message.fromBus = $root.sd3.BusConnection.decode(reader, reader.uint32());
+                            message.fromBus = $root.sd3.BusConnection.decode(reader, reader.uint32(), undefined, long + 1);
                             break;
                         }
                     case 3: {
-                            message.toBus = $root.sd3.BusConnection.decode(reader, reader.uint32());
+                            message.toBus = $root.sd3.BusConnection.decode(reader, reader.uint32(), undefined, long + 1);
                             break;
                         }
                     case 4: {
@@ -7434,7 +7786,7 @@ export const sd3 = $root.sd3 = (() => {
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -7465,19 +7817,23 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Line.verify = function verify(message) {
+            Line.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
                 if (message.fromBus != null && message.hasOwnProperty("fromBus")) {
-                    let error = $root.sd3.BusConnection.verify(message.fromBus);
+                    let error = $root.sd3.BusConnection.verify(message.fromBus, long + 1);
                     if (error)
                         return "fromBus." + error;
                 }
                 if (message.toBus != null && message.hasOwnProperty("toBus")) {
-                    let error = $root.sd3.BusConnection.verify(message.toBus);
+                    let error = $root.sd3.BusConnection.verify(message.toBus, long + 1);
                     if (error)
                         return "toBus." + error;
                 }
@@ -7501,21 +7857,25 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Feeder.Line} Line
              */
-            Line.fromObject = function fromObject(object) {
+            Line.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Feeder.Line)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Feeder.Line();
                 if (object.id != null)
                     message.id = object.id >>> 0;
                 if (object.fromBus != null) {
                     if (typeof object.fromBus !== "object")
                         throw TypeError(".sd3.Feeder.Line.fromBus: object expected");
-                    message.fromBus = $root.sd3.BusConnection.fromObject(object.fromBus);
+                    message.fromBus = $root.sd3.BusConnection.fromObject(object.fromBus, long + 1);
                 }
                 if (object.toBus != null) {
                     if (typeof object.toBus !== "object")
                         throw TypeError(".sd3.Feeder.Line.toBus: object expected");
-                    message.toBus = $root.sd3.BusConnection.fromObject(object.toBus);
+                    message.toBus = $root.sd3.BusConnection.fromObject(object.toBus, long + 1);
                 }
                 if (object.lengthMeters != null)
                     message.lengthMeters = object.lengthMeters >>> 0;
@@ -7612,7 +7972,7 @@ export const sd3 = $root.sd3 = (() => {
             function Load(properties) {
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -7643,9 +8003,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Load.decode = function decode(reader, length, error) {
+            Load.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Feeder.Load();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -7657,11 +8021,11 @@ export const sd3 = $root.sd3 = (() => {
                             break;
                         }
                     case 2: {
-                            message.bus = $root.sd3.BusConnection.decode(reader, reader.uint32());
+                            message.bus = $root.sd3.BusConnection.decode(reader, reader.uint32(), undefined, long + 1);
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -7692,14 +8056,18 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Load.verify = function verify(message) {
+            Load.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
                 if (message.bus != null && message.hasOwnProperty("bus")) {
-                    let error = $root.sd3.BusConnection.verify(message.bus);
+                    let error = $root.sd3.BusConnection.verify(message.bus, long + 1);
                     if (error)
                         return "bus." + error;
                 }
@@ -7714,16 +8082,20 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Feeder.Load} Load
              */
-            Load.fromObject = function fromObject(object) {
+            Load.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Feeder.Load)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Feeder.Load();
                 if (object.id != null)
                     message.id = object.id >>> 0;
                 if (object.bus != null) {
                     if (typeof object.bus !== "object")
                         throw TypeError(".sd3.Feeder.Load.bus: object expected");
-                    message.bus = $root.sd3.BusConnection.fromObject(object.bus);
+                    message.bus = $root.sd3.BusConnection.fromObject(object.bus, long + 1);
                 }
                 return message;
             };
@@ -7802,7 +8174,7 @@ export const sd3 = $root.sd3 = (() => {
             function Capacitor(properties) {
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -7833,9 +8205,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Capacitor.decode = function decode(reader, length, error) {
+            Capacitor.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Feeder.Capacitor();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -7847,11 +8223,11 @@ export const sd3 = $root.sd3 = (() => {
                             break;
                         }
                     case 2: {
-                            message.bus = $root.sd3.BusConnection.decode(reader, reader.uint32());
+                            message.bus = $root.sd3.BusConnection.decode(reader, reader.uint32(), undefined, long + 1);
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -7882,14 +8258,18 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Capacitor.verify = function verify(message) {
+            Capacitor.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
                 if (message.bus != null && message.hasOwnProperty("bus")) {
-                    let error = $root.sd3.BusConnection.verify(message.bus);
+                    let error = $root.sd3.BusConnection.verify(message.bus, long + 1);
                     if (error)
                         return "bus." + error;
                 }
@@ -7904,16 +8284,20 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Feeder.Capacitor} Capacitor
              */
-            Capacitor.fromObject = function fromObject(object) {
+            Capacitor.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Feeder.Capacitor)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Feeder.Capacitor();
                 if (object.id != null)
                     message.id = object.id >>> 0;
                 if (object.bus != null) {
                     if (typeof object.bus !== "object")
                         throw TypeError(".sd3.Feeder.Capacitor.bus: object expected");
-                    message.bus = $root.sd3.BusConnection.fromObject(object.bus);
+                    message.bus = $root.sd3.BusConnection.fromObject(object.bus, long + 1);
                 }
                 return message;
             };
@@ -7995,7 +8379,7 @@ export const sd3 = $root.sd3 = (() => {
             function Regulator(properties) {
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -8050,9 +8434,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Regulator.decode = function decode(reader, length, error) {
+            Regulator.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Feeder.Regulator();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -8080,7 +8468,7 @@ export const sd3 = $root.sd3 = (() => {
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -8111,9 +8499,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Regulator.verify = function verify(message) {
+            Regulator.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -8140,9 +8532,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Feeder.Regulator} Regulator
              */
-            Regulator.fromObject = function fromObject(object) {
+            Regulator.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Feeder.Regulator)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Feeder.Regulator();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -8241,7 +8637,7 @@ export const sd3 = $root.sd3 = (() => {
                 this.busConnections = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
+                        if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             }
 
@@ -8272,9 +8668,13 @@ export const sd3 = $root.sd3 = (() => {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Transformer.decode = function decode(reader, length, error) {
+            Transformer.decode = function decode(reader, length, error, long) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
+                if (long === undefined)
+                    long = 0;
+                if (long > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let end = length === undefined ? reader.len : reader.pos + length, message = new $root.sd3.Feeder.Transformer();
                 while (reader.pos < end) {
                     let tag = reader.uint32();
@@ -8288,11 +8688,11 @@ export const sd3 = $root.sd3 = (() => {
                     case 2: {
                             if (!(message.busConnections && message.busConnections.length))
                                 message.busConnections = [];
-                            message.busConnections.push($root.sd3.BusConnection.decode(reader, reader.uint32()));
+                            message.busConnections.push($root.sd3.BusConnection.decode(reader, reader.uint32(), undefined, long + 1));
                             break;
                         }
                     default:
-                        reader.skipType(tag & 7);
+                        reader.skipType(tag & 7, long);
                         break;
                     }
                 }
@@ -8323,9 +8723,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Transformer.verify = function verify(message) {
+            Transformer.verify = function verify(message, long) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    return "maximum nesting depth exceeded";
                 if (message.id != null && message.hasOwnProperty("id"))
                     if (!$util.isInteger(message.id))
                         return "id: integer expected";
@@ -8333,7 +8737,7 @@ export const sd3 = $root.sd3 = (() => {
                     if (!Array.isArray(message.busConnections))
                         return "busConnections: array expected";
                     for (let i = 0; i < message.busConnections.length; ++i) {
-                        let error = $root.sd3.BusConnection.verify(message.busConnections[i]);
+                        let error = $root.sd3.BusConnection.verify(message.busConnections[i], long + 1);
                         if (error)
                             return "busConnections." + error;
                     }
@@ -8349,9 +8753,13 @@ export const sd3 = $root.sd3 = (() => {
              * @param {Object.<string,*>} object Plain object
              * @returns {sd3.Feeder.Transformer} Transformer
              */
-            Transformer.fromObject = function fromObject(object) {
+            Transformer.fromObject = function fromObject(object, long) {
                 if (object instanceof $root.sd3.Feeder.Transformer)
                     return object;
+                if (long === undefined)
+                    long = 0;
+                if (long > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
                 let message = new $root.sd3.Feeder.Transformer();
                 if (object.id != null)
                     message.id = object.id >>> 0;
@@ -8362,7 +8770,7 @@ export const sd3 = $root.sd3 = (() => {
                     for (let i = 0; i < object.busConnections.length; ++i) {
                         if (typeof object.busConnections[i] !== "object")
                             throw TypeError(".sd3.Feeder.Transformer.busConnections: object expected");
-                        message.busConnections[i] = $root.sd3.BusConnection.fromObject(object.busConnections[i]);
+                        message.busConnections[i] = $root.sd3.BusConnection.fromObject(object.busConnections[i], long + 1);
                     }
                 }
                 return message;
