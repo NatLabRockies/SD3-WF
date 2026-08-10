@@ -3,6 +3,7 @@ from scenario import Scenario
 from constants import START_TIME, END_TIME
 from ip_registry import build_registry
 from cyber import pack_cyber
+import json
 import scenario_pb2
 import csv
 
@@ -25,6 +26,7 @@ print(f"Built cyber registry with {len(cyber_registry)} known entities")
 for scenario_dir in scenarios_dir.iterdir():
     if not scenario_dir.is_dir():
         continue
+    scenario_manifest = scenario_dir / "scenario.json"
     print(f"Processing scenario: {scenario_dir.name}")
     scenario = Scenario(scenario_dir)
     scenarios[scenario_dir.name] = scenario
@@ -33,6 +35,11 @@ for scenario_dir in scenarios_dir.iterdir():
     proto_scenario.name = scenario_dir.name
     proto_scenario.start_time = int(START_TIME.timestamp())
     proto_scenario.end_time = int(END_TIME.timestamp())
+
+    if scenario_manifest.exists():
+        scenario_json: dict = json.load(scenario_manifest.open())
+        proto_scenario.name = scenario_json.get("name", scenario_dir.name)
+        print(f"Scenario Name {proto_scenario.name}")
     scenario.pack(proto_scenario, id_map)
     scenario.pack_batteries(proto_scenario, id_map)
 

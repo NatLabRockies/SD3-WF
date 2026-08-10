@@ -8,40 +8,40 @@
 		}
 	> = new Map([
 		[
-			'baseline',
+			'Baseline',
 			{
 				name: 'Baseline',
 				path: asset('/scenarios/baseline.buff')
 			}
 		],
 		[
-			'api-attack',
+			'API Attack',
 			{
 				name: 'API Attack',
 				path: asset('/scenarios/api-attack.buff')
 			}
-		],
-		[
-			'api-mitigation',
-			{
-				name: 'API Mitigation',
-				path: asset('/scenarios/api-mitigation.buff')
-			}
-		],
-		[
-			'dns-attack',
-			{
-				name: 'DNS Attack',
-				path: asset('/scenarios/dns-attack.buff')
-			}
-		],
-		[
-			'dns-mitigation',
-			{
-				name: 'DNS Mitigation',
-				path: asset('/scenarios/dns-mitigation.buff')
-			}
 		]
+		// [
+		// 	'api-mitigation',
+		// 	{
+		// 		name: 'API Mitigation',
+		// 		path: asset('/scenarios/api-mitigation.buff')
+		// 	}
+		// ],
+		// [
+		// 	'dns-attack',
+		// 	{
+		// 		name: 'DNS Attack',
+		// 		path: asset('/scenarios/dns-attack.buff')
+		// 	}
+		// ],
+		// [
+		// 	'dns-mitigation',
+		// 	{
+		// 		name: 'DNS Mitigation',
+		// 		path: asset('/scenarios/dns-mitigation.buff')
+		// 	}
+		// ]
 	]);
 </script>
 

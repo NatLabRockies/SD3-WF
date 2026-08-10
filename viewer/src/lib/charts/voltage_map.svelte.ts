@@ -128,7 +128,11 @@ export default function voltage_map(options?: {
 				.attr('y1', (d) => {
 					const upstream_data = app_state.scenario.components.get(d.upstream_bus.id);
 					if (!upstream_data || upstream_data.type !== 'bus') {
-						console.warn('Could not find data for bus', d.downstream_bus.id);
+						if (!upstream_data) {
+							console.warn('Could not find data for bus', d.upstream_bus.id);
+						} else {
+							console.warn('Data of wrong type for', d.upstream_bus.id);
+						}
 						return y_scale(0);
 					}
 					const voltage = seek(upstream_data.timeseries, app_state.timestamp)?.voltage ?? 0;
@@ -137,7 +141,11 @@ export default function voltage_map(options?: {
 				.attr('y2', (d) => {
 					const downstream_data = app_state.scenario.components.get(d.downstream_bus.id);
 					if (!downstream_data || downstream_data.type !== 'bus') {
-						console.warn('Could not find data for bus', d.downstream_bus.id);
+						if (!downstream_data) {
+							console.warn('Could not find data for bus', d.downstream_bus.id);
+						} else {
+							console.warn('Data of wrong type for', d.downstream_bus.id);
+						}
 						return y_scale(0);
 					}
 					const voltage = seek(downstream_data.timeseries, app_state.timestamp)?.voltage ?? 0;
