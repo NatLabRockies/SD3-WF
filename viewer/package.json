@@ -17,8 +17,8 @@
 		"test": "npm run test:unit -- --run && npm run test:e2e",
 		"test:e2e": "playwright test",
 		"proto:build": "pbjs -t static-module -w es6 --no-create --no-encode --no-service -o src/lib/generated/sd3.js ../proto/scenario.proto ../proto/feeder.proto && pbts -o src/lib/generated/sd3.d.ts src/lib/generated/sd3.js",
-		"proto:watch": "chokidar '../../../proto/**/*.proto' -c 'bun proto:build'",
-		"prebuild": "bun proto:build"
+		"proto:watch": "chokidar '../../../proto/**/*.proto' -c 'npm run proto:build'",
+		"prebuild": "npm run proto:build"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.59.1",

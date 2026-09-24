@@ -19,3 +19,11 @@ SD3-WF supports the **Education pillar** of the U.S. national [Cyber-Informed En
 - **Students** in energy systems, cybersecurity, or electrical engineering programs
 - **Professionals** seeking hands-on familiarity with DER cyber-physical systems
 - **Educators** looking for open curriculum to accompany grid-edge cybersecurity instruction
+
+## Repository structure
+
+This repository is organized into three top-level components:
+
+- **`proto/`** — Shared [Protocol Buffer](https://protobuf.dev/) schema definitions (`feeder.proto`, `scenario.proto`) that describe the grid topology, time-series, building, battery, and cyber network traffic data formats. These schemas are the common interface between the data pipeline and the viewer.
+- **`pre-processing/`** — A Python pipeline that transforms raw feeder (OpenDSS) and network capture data into the protobuf (`.buff`) datasets used by the viewer. The raw inputs to this pipeline are not distributed with this repository; the resulting `.buff` outputs are already provided under `pre-processing/outputs/`.
+- **`viewer/`** — The web application ("SD3-WF Viewer") that learners interact with. It's a SvelteKit-based static site that loads the provided `.buff` data files and renders the grid, building, battery, and cyber dashboards. See [`viewer/README.md`](viewer/README.md) for viewer-specific development, build, and deployment instructions.
