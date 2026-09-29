@@ -12,7 +12,7 @@ SD3-WF addresses this gap by connecting learners with novel, cross-domain datase
 
 ## How it fits into the national CIE strategy
 
-SD3-WF supports the **Education pillar** of the U.S. national [Cyber-Informed Engineering (CIE)] https://inldigitallibrary.inl.gov/sites/sti/sti/Sort_141694.pdf) strategy, developed in alignment with the CIE Curriculum Guide. The parent SD3 tool addresses the Development, Current Infrastructure, and Future Infrastructure pillars — together, they span the full CIE strategy from conception and design through workforce development.
+SD3-WF supports the **Education pillar** of the U.S. national [Cyber-Informed Engineering (CIE)](https://inldigitallibrary.inl.gov/sites/sti/sti/Sort_141694.pdf) strategy, developed in alignment with the CIE Curriculum Guide. The parent SD3 tool addresses the Development, Current Infrastructure, and Future Infrastructure pillars — together, they span the full CIE strategy from conception and design through workforce development.
 
 ## Who is this for?
 
